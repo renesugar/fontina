@@ -1,6 +1,6 @@
 # Fontina
 
-Fontina is intended to be an ActivityPub-compliant, distributed, photo-sharing-based social network.
+Fontina is intended to be an ActivityPub-compliant, federated, photo-sharing-based social network.
 
 That probably sounds like a lot of complicated buzzword crap, but to keep things simple it would be what happened if you melded together Mastodon and Instagram, more or less.
 
