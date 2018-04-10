@@ -1,0 +1,9 @@
+<%= form_for @conn, b_noauth_user_path(@conn, :login), [as: "user"], fn f -> %>
+  <%= label f, :email, "Email" %>
+  <%= text_input f, :email %>
+  <br>
+  <%= label f, :password, "Password" %>
+  <%= password_input f, :password %>
+  <br>
+  <%= submit "Login" %>
+<% end %>
