@@ -37,7 +37,7 @@ defmodule FontinaWeb.Router do
   end
 
   scope "/", FontinaWeb.NoAuth, as: :b_noauth do
-    pipe_through [:browser, :auth]
+    pipe_through [:browser, :noauth]
 
     get  "/login",    UserController, :login
     post "/login",    UserController, :login_post
