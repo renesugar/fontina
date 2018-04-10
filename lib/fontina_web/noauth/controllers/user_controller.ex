@@ -8,7 +8,7 @@ defmodule FontinaWeb.NoAuth.UserController do
     render conn, "login.html"
   end
 
-  def login_post(conn, %{"user" => %{"email" => email, "password" => password} = user_params} = _params) 
+  def login_post(conn, %{"user" => %{"email" => email, "password" => password} = user_params} = _) 
       when is_binary(email) and is_binary(password) do
     case LoginPolicy.process(user_params) do
       {:ok, %{"user" => user, "token" => token} = _res} ->
@@ -24,6 +24,10 @@ defmodule FontinaWeb.NoAuth.UserController do
     end
   end
 
+  def login_post(conn, _),
+    do: redirect(conn, to: "/login")
+
+
   def register(conn, _) do
     render conn, "register.html"
   end
@@ -35,4 +39,7 @@ defmodule FontinaWeb.NoAuth.UserController do
         redirect(conn, to: "/")
     end
   end
+
+  def register_post(conn, _),
+    do: redirect(conn, to: "/register")
 end
