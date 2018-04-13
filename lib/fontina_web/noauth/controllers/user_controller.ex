@@ -16,8 +16,7 @@ defmodule FontinaWeb.NoAuth.UserController do
         |> assign(:current_user, user)
         |> fetch_session
         |> put_session(:session_token, token.value)
-        |> configure_session(renew: true)
-        |> put_status(:created)
+        |> configure_session(renew: true) 
         |> redirect(to: "/timeline")
       {:error, {_status, _errors}} ->
         redirect(conn, to: "/")
