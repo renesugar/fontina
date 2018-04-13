@@ -1,0 +1,3 @@
+<%= form_for @conn, b_auth_user_path(@conn, :logout), [], fn f -> %>
+  <%= submit "Login" %>
+<% end %>

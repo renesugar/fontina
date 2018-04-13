@@ -13,4 +13,9 @@ defmodule FontinaWeb.Auth.UserController do
     |> configure_session(drop: true)
     |> redirect(to: "/")
   end
+
+  # XXX: Remove later
+  def logout(conn, _) do
+    render conn, "logout.html"
+  end
 end

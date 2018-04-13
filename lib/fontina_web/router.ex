@@ -98,6 +98,9 @@ defmodule FontinaWeb.Router do
     get  "/timeline/global",      FeedController, :global_timeline
 
     post "/logout",               UserController, :logout_post
+
+    # XXX: Temporary, remove later
+    get  "/logout",               UserController, :logout
   end
 
   # Other scopes may use custom stacks.
