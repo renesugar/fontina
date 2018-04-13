@@ -1,6 +1,25 @@
 defmodule FontinaWeb.Router do
   use FontinaWeb, :router
 
+  alias Authable.Helper, as: AuthHelper
+
+  # TODO: Fix error handling here
+  def no_auth_or_redirect(conn, %{"scopes" => scopes, "loc" => loc} = _) do
+    case AuthHelper.authorize_for_resource(conn, scopes) do
+      nil                 -> conn
+      {:error, errors, _} -> conn |> redirect([to: "/"]) |> halt
+      {:ok, current_user} -> conn |> redirect([to: loc]) |> halt
+    end
+  end
+
+  def auth_or_redirect(conn, %{"scopes" => scopes, "loc" => loc} = _) do
+    case AuthHelper.authorize_for_resource(conn, scopes) do
+      nil                 -> conn |> redirect([to: loc]) |> halt
+      {:error, errors, _} -> conn |> redirect([to: "/"]) |> halt
+      {:ok, current_user} -> assign(conn, :current_user, current_user)
+    end
+  end
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -10,11 +29,17 @@ defmodule FontinaWeb.Router do
   end
 
   pipeline :noauth do
-    plug Authable.Plug.UnauthorizedOnly
+    plug :no_auth_or_redirect, %{
+      "scopes" => ~w(session),
+      "loc" => "/timeline"
+    }
   end
 
   pipeline :auth do
-    plug Authable.Plug.Authenticate
+    plug :auth_or_redirect, %{
+      "scopes" => ~w(session),
+      "loc" => "/login"
+    }
   end
 
   # pipeline :api do
@@ -51,8 +76,6 @@ defmodule FontinaWeb.Router do
     post "/register", UserController, :register_post
   end
 
-  # TODO: Figure out how to replace ugly "not authorized" json with a redirect to "/login" (may have to manually write an auth plug)
-  # ^ also, have UnauthorizedOnly resources redirect to "/timeline" I guess
   scope "/", FontinaWeb.Auth, as: :b_auth do
     pipe_through [:browser, :auth]
 
