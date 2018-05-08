@@ -7,12 +7,12 @@ defmodule Fontina.Repo.Migrations.CreateUsers do
       add :nickname, :string
       add :email, :string
       add :bio, :string
-      add :following, {:array, :string}
-      add :followers, {:array, :string}
-      add :pass_hash, :string
+      add :password_hash, :string
 
       timestamps()
     end
 
+    create unique_index(:users, [:username])
+    create unique_index(:users, [:email])
   end
 end

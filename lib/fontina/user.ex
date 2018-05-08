@@ -2,24 +2,34 @@ defmodule Fontina.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Comeonin.Pdkdf2
 
   schema "users" do
-    field :bio, :string
+    field :bio, :string, default: ""
     field :email, :string
-    field :followers, {:array, :string}, default: []
-    field :following, {:array, :string}, default: []
     field :nickname, :string
     field :username, :string
-    field :pass_hash, :string
+    field :password_hash, :string
     field :password, :string, virtual: true
 
     timestamps()
   end
 
-  @doc false
-  def changeset(user, attrs) do
+  def register_changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :nickname, :email, :bio, :following, :followers])
-    |> validate_required([:username, :nickname, :email, :bio, :following, :followers])
+    |> cast(attrs, [:username, :nickname, :email, :password])
+    |> validate_required([:username, :nickname, :email, :password])
+    |> validate_password
+    |> hash_password
+  end
+
+  # TODO: Add password validation ( >8 characters, etc, maybe use not_qwerty123 )
+  defp validate_password(changeset),
+    do: changeset
+
+  # Nils out the password entry and adds the password_hash entry
+  defp hash_password(%Changeset{valid?: true, changes:
+      %{password: password}} = changeset) do
+    change(changeset, Pdkdf2.add_hash(password))
   end
 end
