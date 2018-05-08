@@ -1,4 +1,10 @@
 <%= form_for @conn, b_noauth_user_path(@conn, :register), [as: "user"], fn f -> %>
+  <%= label f, :nickname, "Display Name" %>
+  <%= text_input f, :nickname %>
+  <br>
+  <%= label f, :username, "Username (@username)" %>
+  <%= text_input f, :username %>
+  <br>
   <%= label f, :email, "Email" %>
   <%= text_input f, :email %>
   <br>
