@@ -7,8 +7,7 @@ defmodule Fontina.Policy.Register do
     |> insert_user()
   end
 
-  defp insert_user({
-    "email" => _email,
+  defp insert_user(%{"email" => _email,
     "password" => _pw,
     "username" => _un,
     "nickname" => _nn

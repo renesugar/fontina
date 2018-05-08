@@ -1,8 +1,6 @@
 defmodule Fontina.Policy.Logout do
 
-  alias Authable.Model.Token
-  
-  @repo Application.get_env(:authable, :repo)
+  alias Fontina.{Repo, Token}
 
   def process(params) do
     params
@@ -10,8 +8,8 @@ defmodule Fontina.Policy.Logout do
   end
 
   defp delete_session(%{"token_value" => token_value}) do
-    token = @repo.get_by!(Token, name: "session_token", value: token_value)
+    token = Repo.get_by!(Token, name: "session_token", value: token_value)
 
-    @repo.delete!(token)
+    Repo.delete!(token)
   end
 end
