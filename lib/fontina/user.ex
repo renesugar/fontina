@@ -2,7 +2,7 @@ defmodule Fontina.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Comeonin.Pdkdf2
+  alias Comeonin.Pbkdf2
 
   # TODO: Add domain field
   # If domain = nil, user is local
@@ -33,8 +33,7 @@ defmodule Fontina.User do
     do: changeset
 
   # Nils out the password entry and adds the password_hash entry
-  defp hash_password(%Changeset{valid?: true, changes:
-      %{password: password}} = changeset) do
-    change(changeset, Pdkdf2.add_hash(password))
+  defp hash_password(changeset) do
+    change(changeset, Pbkdf2.add_hash(changeset.password))
   end
 end
