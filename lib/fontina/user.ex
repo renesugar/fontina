@@ -18,6 +18,8 @@ defmodule Fontina.User do
   def register_changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :nickname, :email, :password])
+    |> unique_constraint(:username)
+    |> unique_constraint(:email)
     |> validate_required([:username, :nickname, :email, :password])
     |> validate_password
     |> hash_password
