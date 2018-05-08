@@ -4,6 +4,9 @@ defmodule Fontina.User do
 
   alias Comeonin.Pdkdf2
 
+  # TODO: Add domain field
+  # If domain = nil, user is local
+  # id = $username@$domain
   schema "users" do
     field :bio, :string, default: ""
     field :email, :string
@@ -15,7 +18,7 @@ defmodule Fontina.User do
     timestamps()
   end
 
-  def register_changeset(user, attrs) do
+  def registration_changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :nickname, :email, :password])
     |> unique_constraint(:username)
