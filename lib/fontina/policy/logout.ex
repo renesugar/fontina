@@ -8,7 +8,7 @@ defmodule Fontina.Policy.Logout do
   end
 
   defp delete_session(%{"token_value" => token_value}) do
-    token = Repo.get_by!(Token, name: "session_token", value: token_value)
+    token = Repo.get_by!(Token, value: token_value)
 
     Repo.delete!(token)
   end
