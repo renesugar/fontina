@@ -56,11 +56,3 @@ config :fontina, Fontina.Repo,
   database: "fontina_dev",
   hostname: "localhost",
   pool_size: 10
-
-config :authable, Fontina.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "fontina_dev",
-  hostname: "localhost",
-  pool_size: 10
