@@ -4,7 +4,7 @@ defmodule FontinaWeb.Auth.UserController do
   alias Fontina.Policy.Logout, as: LogoutPolicy
 
   def logout_post(conn, _) do
-    token_value = get_session(fetch_session(conn), :session_token)
+    token_value = get_session(conn, :session_token)
 
     LogoutPolicy.process(%{"token_value" => token_value})
 
