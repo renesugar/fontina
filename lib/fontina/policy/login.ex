@@ -36,7 +36,7 @@ defmodule Fontina.Policy.Login do
   defp validate_pw_match({:ok, %{"user" => user, "password" => pw} = params}) do
     case Pbkdf2.check_pass(user, pw) do
       {:ok, _} -> {:ok, params}
-      {:error, message} -> {:error, message}
+      {:error, message} -> {:error, {:unauthorized, %{password: [message]}}}
     end
   end
 
