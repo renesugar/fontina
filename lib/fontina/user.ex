@@ -34,6 +34,6 @@ defmodule Fontina.User do
 
   # Nils out the password entry and adds the password_hash entry
   defp hash_password(changeset) do
-    change(changeset, Pbkdf2.add_hash(changeset.password))
+    change(changeset, Pbkdf2.add_hash(changeset.changes.password))
   end
 end
