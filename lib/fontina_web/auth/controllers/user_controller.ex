@@ -8,7 +8,8 @@ defmodule FontinaWeb.Auth.UserController do
 
     LogoutPolicy.process(%{"token_value" => token_value})
 
-    conn
+    # Drop the current user
+    update_in(conn.assigns, &Map.drop(&1, [:current_user]))
     |> fetch_session()
     |> configure_session(drop: true)
     |> redirect(to: "/")
