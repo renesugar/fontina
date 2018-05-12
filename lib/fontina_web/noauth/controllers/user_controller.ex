@@ -31,10 +31,14 @@ defmodule FontinaWeb.NoAuth.UserController do
     render conn, "register.html"
   end
 
-  def register_post(conn, %{"user" => %{"username" => _,
-    "nickname" => _,
-    "email" => _,
-    "password" => _} = user_params} = params) do
+  def register_post(conn, %{"user" => %{"username" => un,
+    "nickname" => nick,
+    "email" => em,
+    "password" => pw} = user_params} = params) 
+      when is_binary(un) and
+           is_binary(nick) and
+           is_binary(em) and
+           is_binary(pw) do
     case RegisterPolicy.process(user_params) do
       {:ok, _} -> login_post(conn, params)
       {:error, {_status, _errors}} ->
