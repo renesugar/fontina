@@ -1,55 +1,57 @@
 defmodule Fontina.Policy.Login do
 
-  alias Authable.Utils.Crypt
-  alias Authable.Model.{User, Token}
-  
-  @repo Application.get_env(:authable, :repo)
+  alias Comeonin.Pbkdf2
+  alias Fontina.{User, Token, Repo}
 
   def process(params) do
     params
-    |> validate_email()
+    |> validate_email_or_username()
     |> validate_pw_match()
-    |> validate_email_confirm()
     |> insert_session_token()
   end
   
+  defp validate_email_or_username(%{"ident" => ident} = params) do
+    case String.contains?(ident, "@") do
+      true -> validate_email(params)
+      false -> validate_username(params)
+    end
+  end
 
-  # Start Fallbacks
-  defp validate_pw_match({:error, {_status, _errors} = opts}),
-    do: {:error, opts}
-
-  defp validate_email_confirm({:error, {_status, _errors} = opts}),
-    do: {:error, opts}
-
-  defp insert_session_token({:error, {_status, _errors} = opts}),
-    do: {:error, opts}
-  # End Fallbacks
-
-  defp validate_email(%{"email" => email} = params) do
-    case @repo.get_by(User, email: email) do
+  # Email
+  defp validate_email(%{"ident" => email} = params) do
+    case Repo.get_by(User, email: email) do
       nil  -> {:error, {:unauthorized, %{email: ["Email doesn't exist y'all"]}}}
       user -> {:ok, Map.put(params, "user", user)}
     end
   end
 
-  defp validate_pw_match({:ok, %{"user" => user, "password" => pw} = params}) do
-    case Crypt.match_password(pw, Map.get(user, :password, "")) do
-      false -> {:error, {:unauthorized, %{password: ["Wrong password"]}}}
-      true  -> {:ok, params}
+  # Username
+  defp validate_username(%{"ident" => username} = params) do
+    case Repo.get_by(User, username: username) do
+      nil  -> {:error, {:unauthorized, %{username: ["user doesn't exist y'all"]}}}
+      user -> {:ok, Map.put(params, "user", user)}
     end
   end
 
-  # TODO: Implement email confirmation
-  defp validate_email_confirm({:ok, %{"email" => _email} = params}) do
-    {:ok, params}
+  defp validate_pw_match({:ok, %{"user" => user, "password" => pw} = params}) do
+    case Pbkdf2.check_pass(user, pw) do
+      {:ok, _} -> {:ok, params}
+      {:error, message} -> {:error, {:unauthorized, %{password: [message]}}}
+    end
   end
 
+  defp validate_pw_match({:error, {_status, _errors} = opts}),
+    do: {:error, opts}
+
   defp insert_session_token({:ok, %{"user" => user} = params}) do
-    changeset = Token.session_token_changeset(%Token{}, %{user_id: user.id,
-      details: %{"scope" => "session"}})
-    case @repo.insert(changeset) do
+    changeset = Token.token_changeset(%Token{}, %{user_id: user.id,
+      browser: true})
+    case Repo.insert(changeset) do
       {:ok, token}        -> {:ok, Map.put(params, "token", token)}
       {:error, changeset} -> {:error, {:failed_transaction, changeset}}
     end
   end
+
+  defp insert_session_token({:error, {_status, _errors} = opts}),
+    do: {:error, opts}
 end

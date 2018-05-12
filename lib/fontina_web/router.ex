@@ -1,22 +1,24 @@
 defmodule FontinaWeb.Router do
   use FontinaWeb, :router
 
-  alias Authable.Helper, as: AuthHelper
+  alias Fontina.Helper.Auth, as: AuthHelper
 
   # TODO: Fix error handling here
-  def no_auth_or_redirect(conn, %{"scopes" => scopes, "loc" => loc} = _) do
-    case AuthHelper.authorize_for_resource(conn, scopes) do
+  def no_auth_or_redirect(conn, loc) do
+    case AuthHelper.authorize_for_resource(conn) do
       nil                 -> conn
-      {:error, errors, _} -> conn |> redirect([to: "/"]) |> halt
-      {:ok, current_user} -> conn |> redirect([to: loc]) |> halt
+      {:error, _} -> conn |> redirect([to: "/"]) |> halt
+      {:ok, current_user} -> assign(conn, :current_user, current_user) |> redirect([to: loc]) |> halt
+      :ok                 -> conn |> redirect([to: loc]) |> halt
     end
   end
 
-  def auth_or_redirect(conn, %{"scopes" => scopes, "loc" => loc} = _) do
-    case AuthHelper.authorize_for_resource(conn, scopes) do
+  def auth_or_redirect(conn, loc) do
+    case AuthHelper.authorize_for_resource(conn) do
       nil                 -> conn |> redirect([to: loc]) |> halt
-      {:error, errors, _} -> conn |> redirect([to: "/"]) |> halt
+      {:error, _} -> conn |> redirect([to: "/"]) |> halt
       {:ok, current_user} -> assign(conn, :current_user, current_user)
+      :ok                 -> conn
     end
   end
 
@@ -29,17 +31,11 @@ defmodule FontinaWeb.Router do
   end
 
   pipeline :noauth do
-    plug :no_auth_or_redirect, %{
-      "scopes" => ~w(session),
-      "loc" => "/timeline"
-    }
+    plug :no_auth_or_redirect, "/timeline"
   end
 
   pipeline :auth do
-    plug :auth_or_redirect, %{
-      "scopes" => ~w(session),
-      "loc" => "/login"
-    }
+    plug :auth_or_redirect, "/login"
   end
 
   # pipeline :api do
