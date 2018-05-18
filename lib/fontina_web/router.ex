@@ -7,18 +7,18 @@ defmodule FontinaWeb.Router do
   def no_auth_or_redirect(conn, loc) do
     case AuthHelper.authorize_for_resource(conn) do
       nil                 -> conn
-      {:error, _} -> conn |> redirect([to: "/"]) |> halt
       {:ok, current_user} -> assign(conn, :current_user, current_user) |> redirect([to: loc]) |> halt
       :ok                 -> conn |> redirect([to: loc]) |> halt
+      {:error, _}         -> conn |> redirect([to: "/"]) |> halt
     end
   end
 
   def auth_or_redirect(conn, loc) do
     case AuthHelper.authorize_for_resource(conn) do
       nil                 -> conn |> redirect([to: loc]) |> halt
-      {:error, _} -> conn |> redirect([to: "/"]) |> halt
       {:ok, current_user} -> assign(conn, :current_user, current_user)
       :ok                 -> conn
+      {:error, _}         -> conn |> redirect([to: "/"]) |> halt
     end
   end
 
