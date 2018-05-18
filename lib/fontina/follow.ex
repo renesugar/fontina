@@ -2,7 +2,7 @@ defmodule Fontina.Follow do
   use Ecto.Schema
   import Ecto.Changeset
 
-  import Fontina.{User, Repo}
+  alias Fontina.{User, Repo, Follow}
 
   schema "follows" do
     field :follower_id, :id
